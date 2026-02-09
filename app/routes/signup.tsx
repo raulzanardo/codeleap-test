@@ -1,16 +1,29 @@
 import { useState } from "react";
+import { useNavigate } from "react-router";
 import { Modal } from "../components/modal";
 import TextInput from "../components/textInput";
 
-export function SignUp() {
+export function meta() {
+  return [
+    { title: "CodeLeap Engineering Test - Sign Up" },
+    { name: "description", content: "CodeLeap Engineering Test - Sign Up" },
+  ];
+}
+
+export default function Home() {
   const [open, setOpen] = useState(true);
   const [username, setUsername] = useState("");
+  const navigate = useNavigate();
 
   function handleSubmit(name: string) {
     if (name.trim().length === 0) return;
-    console.log("username submitted:", name);
+    // store username and navigate to main page
+    try {
+      localStorage.setItem("username", name);
+    } catch (e) {}
     setOpen(false);
     setUsername("");
+    navigate("/home");
   }
 
   return (
