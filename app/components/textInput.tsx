@@ -31,9 +31,7 @@ const TextInput = forwardRef<any, TextInputProps>(
   ) => {
     return (
       <div>
-        {title ? (
-          <p className="text-[16px] text-gray-600 mb-2">{title}</p>
-        ) : null}
+        {title ? <p className="text-base text-gray-600 mb-2">{title}</p> : null}
         {multiline ? (
           <textarea
             ref={ref}
@@ -43,7 +41,7 @@ const TextInput = forwardRef<any, TextInputProps>(
             aria-label={ariaLabel}
             autoFocus={autoFocus}
             rows={rows}
-            className={`w-full border border-[#777777] rounded-lg px-3 py-2 mb-4 focus:outline-none focus:ring-2 focus:ring-primary resize-vertical ${className}`}
+            className={`w-full border border-[#777777] rounded-lg px-3 py-2 mb-4 focus:outline-none focus:ring-2 focus:ring-primary resize-vertical placeholder-[#CCCCCC] ${className} text-sm`}
           />
         ) : (
           <input
@@ -56,7 +54,7 @@ const TextInput = forwardRef<any, TextInputProps>(
             onKeyDown={(e) => {
               if (e.key === "Enter") onEnter?.();
             }}
-            className={`w-full border border-[#777777] rounded-lg px-3 py-2 mb-4 focus:outline-none focus:ring-2 focus:ring-primary ${className}`}
+            className={`w-full border border-[#777777] rounded-lg px-3 py-2 mb-4 focus:outline-none focus:ring-2 focus:ring-primary placeholder-[#CCCCCC] ${className} text-sm`}
           />
         )}
       </div>
