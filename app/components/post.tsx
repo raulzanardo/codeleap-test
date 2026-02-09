@@ -9,6 +9,26 @@ type PostProps = {
   className?: string;
 };
 
+function formatTime(created_datetime?: string) {
+  if (!created_datetime) return "";
+  const then = new Date(created_datetime).getTime();
+  const now = Date.now();
+  const diffMs = now - then;
+  const diffMinutes = Math.floor(diffMs / 60000);
+  if (diffMinutes < 1) return "just now";
+  if (diffMinutes < 60)
+    return `${diffMinutes} minute${diffMinutes === 1 ? "" : "s"} ago`;
+  const diffHours = Math.floor(diffMinutes / 60);
+  if (diffHours < 24)
+    return `${diffHours} hour${diffHours === 1 ? "" : "s"} ago`;
+  // older than a day: show local date
+  try {
+    return new Date(created_datetime).toLocaleDateString();
+  } catch (e) {
+    return created_datetime;
+  }
+}
+
 export default function Post({
   id,
   title,
@@ -23,7 +43,7 @@ export default function Post({
     <article
       className={`bg-white rounded-2xl border border-[#999999] overflow-hidden ${className}`}
     >
-      <header className="bg-primary text-white px-6 py-4 flex items-center justify-between border-b border-primary">
+      <header className="bg-primary text-white px-6 py-4 flex items-center justify-between border-b border-primary h-[70px]">
         <h3 className="text-xl font-semibold">{title}</h3>
         <div className="flex items-center gap-3">
           <button
@@ -31,19 +51,16 @@ export default function Post({
             onClick={() => onDelete?.(id)}
             className="p-2 rounded hover:bg-white/20"
           >
-            {/* simple trash icon */}
             <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5"
+              width="19"
+              height="23"
+              viewBox="0 0 19 23"
               fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth={2}
+              xmlns="http://www.w3.org/2000/svg"
             >
               <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M1 7h22"
+                d="M1.30014 20C1.30014 21.375 2.47026 22.5 3.90041 22.5H14.3015C15.7317 22.5 16.9018 21.375 16.9018 20V5H1.30014V20ZM4.49848 11.1L6.33167 9.3375L9.10097 11.9875L11.8573 9.3375L13.6905 11.1L10.9342 13.75L13.6905 16.4L11.8573 18.1625L9.10097 15.5125L6.34468 18.1625L4.51148 16.4L7.26777 13.75L4.49848 11.1ZM13.6515 1.25L12.3513 0H5.85062L4.55048 1.25H0V3.75H18.2019V1.25H13.6515Z"
+                fill="white"
               />
             </svg>
           </button>
@@ -53,17 +70,19 @@ export default function Post({
             className="p-2 rounded hover:bg-white/20"
           >
             <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5"
+              width="32"
+              height="30"
+              viewBox="0 0 32 30"
               fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth={2}
+              xmlns="http://www.w3.org/2000/svg"
             >
               <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5M18.5 2.5a2.121 2.121 0 113 3L12 15l-4 1 1-4 9.5-9.5z"
+                d="M9.10107 21.2663L14.8386 21.2475L27.3615 9.3225C27.853 8.85 28.1234 8.2225 28.1234 7.555C28.1234 6.8875 27.853 6.26 27.3615 5.7875L25.2995 3.805C24.3166 2.86 22.6017 2.865 21.6266 3.80125L9.10107 15.7288V21.2663ZM23.4611 5.5725L25.527 7.55125L23.4507 9.52875L21.3887 7.5475L23.4611 5.5725ZM11.7014 16.7713L19.5412 9.305L21.6032 11.2875L13.7647 18.7513L11.7014 18.7575V16.7713Z"
+                fill="white"
+              />
+              <path
+                d="M6.50067 26.25H24.7026C26.1367 26.25 27.3029 25.1287 27.3029 23.75V12.915L24.7026 15.415V23.75H10.6065C10.5727 23.75 10.5376 23.7625 10.5038 23.7625C10.4609 23.7625 10.418 23.7512 10.3738 23.75H6.50067V6.25H15.4027L18.003 3.75H6.50067C5.06661 3.75 3.90039 4.87125 3.90039 6.25V23.75C3.90039 25.1287 5.06661 26.25 6.50067 26.25Z"
+                fill="white"
               />
             </svg>
           </button>
@@ -72,13 +91,11 @@ export default function Post({
 
       <div className="p-6">
         <div className="flex items-start justify-between">
-          <div className="text-sm text-gray-500">
+          <div className="text-sm text-gray-500 font-bold">
             @{username ?? "Anonymous"}
           </div>
           <div className="text-xs text-gray-500">
-            {created_datetime
-              ? new Date(created_datetime).toLocaleString()
-              : ""}
+            {formatTime(created_datetime)}
           </div>
         </div>
 

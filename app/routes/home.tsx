@@ -43,7 +43,8 @@ export default function Home() {
         const res = await fetch("https://dev.codeleap.co.uk/careers/");
         if (!res.ok) throw new Error("Failed to fetch posts");
         const data = await res.json();
-        setPosts(data.results ?? []);
+        // reverse results so newest posts show first
+        setPosts((data.results ?? []).slice().reverse());
       } catch (e) {
         setPosts([]);
       }
@@ -56,9 +57,11 @@ export default function Home() {
     if (title.trim().length === 0 || content.trim().length === 0) return;
     try {
       const payload = {
-        username: username ?? "Anonymous",
+        username: username ?? "",
+        created_datetime: new Date().toISOString(),
         title: title.trim(),
         content: content.trim(),
+        author_ip: "",
       };
 
       const res = await fetch("https://dev.codeleap.co.uk/careers/", {
