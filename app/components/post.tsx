@@ -135,6 +135,7 @@ export default function Post({
       <Modal
         open={confirmDeleteOpen}
         title="Are you sure you want to delete this item?"
+        width="w-2xl"
         onClose={() => setConfirmDeleteOpen(false)}
         actions={[
           {
@@ -157,7 +158,7 @@ export default function Post({
       <Modal
         open={editOpen}
         title="Edit post"
-        subtitle="Update the title and content"
+        width="w-2xl"
         onClose={() => setEditOpen(false)}
         actions={[
           {
@@ -170,6 +171,8 @@ export default function Post({
             key: "save",
             label: "Save",
             variant: "success",
+            disabled:
+              editTitle.trim().length === 0 || editContent.trim().length === 0,
             onClick: () => saveEdit(),
           },
         ]}

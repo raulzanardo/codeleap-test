@@ -148,7 +148,7 @@ export default function Home() {
             ariaLabel="Post content"
             title="Content"
             multiline
-            rows={6}
+            rows={3}
           />
 
           <div className="flex justify-end ">

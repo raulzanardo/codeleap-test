@@ -11,6 +11,7 @@ type ModalProps = {
   closeOnOverlayClick?: boolean;
   showOverlay?: boolean;
   subtitle?: string;
+  width?: string;
   actions?: Array<{
     key?: string | number;
     label: React.ReactNode;
@@ -31,10 +32,12 @@ export function Modal({
   closeOnOverlayClick = true,
   showOverlay = true,
   subtitle,
+  width = "w-lg",
   actions,
   children,
 }: ModalProps) {
   const [value, setValue] = useState("");
+  const [mouseDownOnOverlay, setMouseDownOnOverlay] = useState(false);
 
   useEffect(() => {
     if (open) setValue("");
@@ -56,12 +59,24 @@ export function Modal({
       style={{
         backgroundColor: showOverlay ? "rgba(119,119,119,0.8)" : "transparent",
       }}
+      onMouseDown={(e) => {
+        if (e.target === e.currentTarget) {
+          setMouseDownOnOverlay(true);
+        }
+      }}
       onClick={(e) => {
-        if (e.target === e.currentTarget && closeOnOverlayClick && onClose)
+        if (
+          e.target === e.currentTarget &&
+          closeOnOverlayClick &&
+          mouseDownOnOverlay &&
+          onClose
+        ) {
           onClose();
+        }
+        setMouseDownOnOverlay(false);
       }}
     >
-      <div className={`bg-white rounded-2xl p-6 w-lg max-w-[95vw]`}>
+      <div className={`bg-white rounded-2xl p-6 ${width} max-w-[95vw]`}>
         <h2 className="text-[22px] font-semibold text-gray-900 mb-4">
           {title}
         </h2>
