@@ -75,10 +75,8 @@ export default function Post({
     }
   }
   return (
-    <article
-      className={`bg-white rounded-2xl border border-[#999999] overflow-hidden ${className}`}
-    >
-      <header className="bg-primary text-white  pl-6 pr-3 py-4 flex items-center justify-between border-b border-primary h-[70px]">
+    <article className={`bg-white rounded-2xl overflow-hidden ${className}`}>
+      <header className="bg-primary text-white pl-6 pr-3 py-4 flex items-center justify-between">
         <h3 className="text-xl font-semibold">{title}</h3>
         <div className="flex items-center gap-3">
           {loggedUser && username && username.trim() === loggedUser.trim() && (
@@ -132,7 +130,7 @@ export default function Post({
         </div>
       </header>
 
-      <div className="p-6">
+      <div className="p-6 border border-[#999999] border-t-0 rounded-2xl rounded-tl-none rounded-tr-none">
         <div className="flex items-start justify-between">
           <div className="text-lg text-gray-500 font-bold">
             @{username ?? "Anonymous"}
