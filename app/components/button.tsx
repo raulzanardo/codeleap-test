@@ -1,4 +1,4 @@
-import React from "react";
+// No default React import required with the automatic JSX runtime
 
 type ButtonProps = {
   children: React.ReactNode;

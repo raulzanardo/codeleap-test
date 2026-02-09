@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import Button from "./button";
 
 type ModalProps = {
@@ -61,7 +61,7 @@ export function Modal({
           onClose();
       }}
     >
-      <div className="bg-white rounded-2xl p-6 w-[520px] max-w-[95vw]">
+      <div className="bg-white rounded-2xl p-6 w-lg max-w-[95vw]">
         <h2 className="text-[22px] font-semibold text-gray-900 mb-4">
           {title}
         </h2>
