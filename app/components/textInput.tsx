@@ -34,7 +34,7 @@ const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
         onKeyDown={(e) => {
           if (e.key === "Enter") onEnter?.();
         }}
-        className={`w-full border border-[#777777] rounded-lg px-3 py-2 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-300 ${className}`}
+        className={`w-full border border-[#777777] rounded-lg px-3 py-2 mb-4 focus:outline-none focus:ring-2 focus:ring-[#7695EC] ${className}`}
       />
     );
   },
