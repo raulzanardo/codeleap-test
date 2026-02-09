@@ -6,6 +6,7 @@ type ModalProps = {
   title?: string;
   onClose?: () => void;
   onSubmit?: (value: string) => void;
+
   closeOnEsc?: boolean;
   closeOnOverlayClick?: boolean;
   showOverlay?: boolean;
@@ -51,21 +52,22 @@ export function Modal({
 
   return (
     <div
-      className={`fixed inset-0 z-50 flex items-center justify-center ${
-        showOverlay ? "bg-gray-500 bg-opacity-40" : "bg-transparent"
-      }`}
+      className="fixed inset-0 z-50 flex items-center justify-center"
+      style={{
+        backgroundColor: showOverlay ? "rgba(119,119,119,0.8)" : "transparent",
+      }}
       onClick={(e) => {
         if (e.target === e.currentTarget && closeOnOverlayClick && onClose)
           onClose();
       }}
     >
-      <div className="bg-white rounded-2xl p-6 w-lg max-w-[95vw]">
+      <div className={`bg-white rounded-2xl p-6 w-lg max-w-[95vw]`}>
         <h2 className="text-[22px] font-semibold text-gray-900 mb-4">
           {title}
         </h2>
-        <p className="text-[16px] text-gray-600 mb-2">
-          {subtitle ?? "Please enter your username"}
-        </p>
+        {subtitle && (
+          <p className="text-[16px] text-gray-600 mb-2">{subtitle}</p>
+        )}
 
         <div className="w-full">{children}</div>
 

@@ -5,6 +5,7 @@ import Card from "../components/card";
 import Post from "../components/post";
 import TextInput from "../components/textInput";
 import Button from "../components/button";
+import Modal from "~/components/modal";
 
 type Post = {
   id: number;
@@ -27,6 +28,13 @@ export default function Home() {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [posts, setPosts] = useState<Post[]>([]);
+  const baseUrl = "https://dev.codeleap.co.uk/careers/?limit=10";
+  const [currentUrl, setCurrentUrl] = useState<string>(baseUrl);
+  const [nextUrl, setNextUrl] = useState<string | null>(null);
+  const [prevUrl, setPrevUrl] = useState<string | null>(null);
+  const [pageNumber, setPageNumber] = useState<number>(1);
+  const [totalCount, setTotalCount] = useState<number | null>(null);
+  const [reloadKey, setReloadKey] = useState<number>(0);
 
   useEffect(() => {
     try {
@@ -38,20 +46,40 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    async function fetchPosts() {
+    async function fetchPosts(url: string) {
       try {
-        const res = await fetch("https://dev.codeleap.co.uk/careers/");
+        const res = await fetch(url);
         if (!res.ok) throw new Error("Failed to fetch posts");
         const data = await res.json();
-        // reverse results so newest posts show first
-        setPosts((data.results ?? []).slice().reverse());
+        // store pagination links and total count
+        setNextUrl(data.next ?? null);
+        setPrevUrl(data.previous ?? null);
+        setTotalCount(typeof data.count === "number" ? data.count : null);
+        // use API order (do not reverse)
+        setPosts(data.results ?? []);
       } catch (e) {
         setPosts([]);
+        setNextUrl(null);
+        setPrevUrl(null);
+        setTotalCount(null);
       }
     }
 
-    fetchPosts();
-  }, []);
+    fetchPosts(currentUrl);
+  }, [currentUrl, reloadKey]);
+
+  // handlers for pagination controls
+  function handleNext() {
+    if (!nextUrl) return;
+    setCurrentUrl(nextUrl);
+    setPageNumber((p) => p + 1);
+  }
+
+  function handlePrev() {
+    if (!prevUrl) return;
+    setCurrentUrl(prevUrl);
+    setPageNumber((p) => Math.max(1, p - 1));
+  }
 
   async function createPost() {
     if (title.trim().length === 0 || content.trim().length === 0) return;
@@ -73,10 +101,28 @@ export default function Home() {
       if (!res.ok) throw new Error("Failed to create post");
 
       const created = await res.json();
-      // API returns created object; prepend to posts
-      setPosts((prev) => [created, ...prev]);
+      // after creating, refresh first page so the new post appears
       setTitle("");
       setContent("");
+      setCurrentUrl(baseUrl);
+      setPageNumber(1);
+      setReloadKey((k) => k + 1);
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  async function deletePost(id?: number | string) {
+    if (!id) return;
+    try {
+      const res = await fetch(`https://dev.codeleap.co.uk/careers/${id}/`, {
+        method: "DELETE",
+      });
+      if (!res.ok) throw new Error("Failed to delete post");
+      // after delete, refresh first page so newest posts are shown first
+      setCurrentUrl(baseUrl);
+      setPageNumber(1);
+      setReloadKey((k) => k + 1);
     } catch (e) {
       console.error(e);
     }
@@ -129,10 +175,41 @@ export default function Home() {
                 username={p.username}
                 created_datetime={p.created_datetime}
                 content={p.content}
-                onEdit={(id) => console.log("edit", id)}
-                onDelete={(id) => console.log("delete", id)}
+                onEdit={() => setReloadKey((k) => k + 1)}
+                onDelete={(id) => deletePost(id)}
               />
             ))}
+
+            <div className="flex items-center justify-between mt-4">
+              <div>
+                <Button
+                  variant="outline"
+                  onClick={handlePrev}
+                  ariaLabel="Previous page"
+                  disabled={!prevUrl}
+                >
+                  Previous
+                </Button>
+              </div>
+
+              <div className="text-sm text-gray-600">
+                Page {pageNumber}
+                {totalCount
+                  ? ` of ${Math.max(1, Math.ceil(totalCount / 10))}`
+                  : ""}
+              </div>
+
+              <div>
+                <Button
+                  variant="outline"
+                  onClick={handleNext}
+                  ariaLabel="Next page"
+                  disabled={!nextUrl}
+                >
+                  Next
+                </Button>
+              </div>
+            </div>
           </div>
         )}
       </main>

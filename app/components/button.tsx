@@ -24,10 +24,10 @@ export default function Button({
 
   const variants: Record<string, string> = {
     primary: "bg-primary hover:bg-[#5a75d6] text-white",
-    danger: "bg-red-500 hover:bg-red-600 text-white",
-    success: "bg-green-500 hover:bg-green-600 text-white",
+    danger: "bg-[#FF5151] text-white",
+    success: "bg-[#47B960]  text-white",
     outline: "bg-white border border-gray-300 text-black",
-    outlineBlack: "bg-white border-2 border-black text-black",
+    outlineBlack: "bg-white border-1 border-[#999999] text-black",
   };
 
   const variantClassRaw = variants[variant] ?? variants.primary;

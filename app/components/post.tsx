@@ -1,3 +1,7 @@
+import { useState } from "react";
+import Modal from "./modal";
+import TextInput from "./textInput";
+
 type PostProps = {
   id?: number | string;
   title: string;
@@ -39,16 +43,37 @@ export default function Post({
   onDelete,
   className = "",
 }: PostProps) {
+  const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
+  const [editTitle, setEditTitle] = useState(title);
+  const [editContent, setEditContent] = useState(content);
+
+  async function saveEdit() {
+    if (!id) return;
+    try {
+      const payload = { title: editTitle.trim(), content: editContent.trim() };
+      const res = await fetch(`https://dev.codeleap.co.uk/careers/${id}/`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) throw new Error("Failed to update post");
+      onEdit?.(id);
+      setEditOpen(false);
+    } catch (e) {
+      console.error(e);
+    }
+  }
   return (
     <article
       className={`bg-white rounded-2xl border border-[#999999] overflow-hidden ${className}`}
     >
-      <header className="bg-primary text-white px-6 py-4 flex items-center justify-between border-b border-primary h-[70px]">
+      <header className="bg-primary text-white  pl-6 pr-3 py-4 flex items-center justify-between border-b border-primary h-[70px]">
         <h3 className="text-xl font-semibold">{title}</h3>
         <div className="flex items-center gap-3">
           <button
             aria-label="Delete"
-            onClick={() => onDelete?.(id)}
+            onClick={() => setConfirmDeleteOpen(true)}
             className="p-2 rounded hover:bg-white/20"
           >
             <svg
@@ -66,7 +91,11 @@ export default function Post({
           </button>
           <button
             aria-label="Edit"
-            onClick={() => onEdit?.(id)}
+            onClick={() => {
+              setEditTitle(title);
+              setEditContent(content);
+              setEditOpen(true);
+            }}
             className="p-2 rounded hover:bg-white/20"
           >
             <svg
@@ -103,6 +132,66 @@ export default function Post({
           {content}
         </div>
       </div>
+      <Modal
+        open={confirmDeleteOpen}
+        title="Are you sure you want to delete this item?"
+        onClose={() => setConfirmDeleteOpen(false)}
+        actions={[
+          {
+            key: "cancel",
+            label: "Cancel",
+            variant: "outlineBlack",
+            onClick: () => setConfirmDeleteOpen(false),
+          },
+          {
+            key: "delete",
+            label: "Delete",
+            variant: "danger",
+            onClick: () => {
+              onDelete?.(id);
+              setConfirmDeleteOpen(false);
+            },
+          },
+        ]}
+      />
+      <Modal
+        open={editOpen}
+        title="Edit post"
+        subtitle="Update the title and content"
+        onClose={() => setEditOpen(false)}
+        actions={[
+          {
+            key: "cancel",
+            label: "Cancel",
+            variant: "outlineBlack",
+            onClick: () => setEditOpen(false),
+          },
+          {
+            key: "save",
+            label: "Save",
+            variant: "success",
+            onClick: () => saveEdit(),
+          },
+        ]}
+      >
+        <div className="space-y-3">
+          <TextInput
+            value={editTitle}
+            onChange={setEditTitle}
+            title="Title"
+            ariaLabel="Edit title"
+          />
+
+          <TextInput
+            value={editContent}
+            onChange={setEditContent}
+            title="Content"
+            ariaLabel="Edit content"
+            multiline
+            rows={4}
+          />
+        </div>
+      </Modal>
     </article>
   );
 }
