@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Modal from "./modal";
 import TextInput from "./textInput";
 
@@ -10,6 +10,7 @@ type PostProps = {
   content: string;
   onEdit?: (id?: number | string) => void;
   onDelete?: (id?: number | string) => void;
+  onComment?: (id?: number | string, comment?: string) => void;
   className?: string;
 };
 
@@ -47,7 +48,13 @@ export default function Post({
   const [editOpen, setEditOpen] = useState(false);
   const [editTitle, setEditTitle] = useState(title);
   const [editContent, setEditContent] = useState(content);
+  const [commentOpen, setCommentOpen] = useState(false);
+  const [commentText, setCommentText] = useState("");
   const [loggedUser, setLoggedUser] = useState<string | null>(null);
+  const [toastOpen, setToastOpen] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
+  const toastTimer = useRef<number | null>(null);
+  const [likeLoading, setLikeLoading] = useState(false);
 
   useEffect(() => {
     try {
@@ -57,6 +64,17 @@ export default function Post({
       setLoggedUser(null);
     }
   }, []);
+
+  useEffect(() => {
+    if (!toastOpen) return;
+    toastTimer.current = window.setTimeout(() => setToastOpen(false), 2800);
+    return () => {
+      if (toastTimer.current) {
+        clearTimeout(toastTimer.current);
+        toastTimer.current = null;
+      }
+    };
+  }, [toastOpen]);
 
   async function saveEdit() {
     if (!id) return;
@@ -70,16 +88,46 @@ export default function Post({
       if (!res.ok) throw new Error("Failed to update post");
       onEdit?.(id);
       setEditOpen(false);
+      setToastMessage("Post edited");
+      setToastOpen(true);
     } catch (e) {
       console.error(e);
     }
   }
+
+  async function onComment(id?: number | string, comment?: string) {
+    if (!id || !comment) return;
+    try {
+      // Fake comment submission: simulate network latency then succeed
+      await new Promise((res) => setTimeout(res, 400));
+      // In a real integration we'd POST to the API. Here we simulate success.
+      setToastMessage("Comment added (simulated)");
+      setToastOpen(true);
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  async function onLiked(id?: number | string) {
+    if (!id) return;
+    try {
+      setLikeLoading(true);
+      await new Promise((res) => setTimeout(res, 350));
+      setToastMessage("Post liked (simulated)");
+      setToastOpen(true);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLikeLoading(false);
+    }
+  }
+
   return (
     <article className={`bg-white rounded-2xl overflow-hidden ${className}`}>
       <header className="bg-primary text-white pl-6 pr-3 py-4 flex items-center justify-between">
         <h3 className="text-xl font-semibold">{title}</h3>
         <div className="flex items-center gap-3">
-          {loggedUser && username && username.trim() === loggedUser.trim() && (
+          {username && loggedUser && username.trim() === loggedUser.trim() ? (
             <>
               <button
                 aria-label="Delete"
@@ -87,8 +135,8 @@ export default function Post({
                 className="p-2 rounded hover:bg-white/20"
               >
                 <svg
-                  width="19"
-                  height="23"
+                  width="32"
+                  height="30"
                   viewBox="0 0 19 23"
                   fill="none"
                   xmlns="http://www.w3.org/2000/svg"
@@ -121,6 +169,49 @@ export default function Post({
                   />
                   <path
                     d="M6.50067 26.25H24.7026C26.1367 26.25 27.3029 25.1287 27.3029 23.75V12.915L24.7026 15.415V23.75H10.6065C10.5727 23.75 10.5376 23.7625 10.5038 23.7625C10.4609 23.7625 10.418 23.7512 10.3738 23.75H6.50067V6.25H15.4027L18.003 3.75H6.50067C5.06661 3.75 3.90039 4.87125 3.90039 6.25V23.75C3.90039 25.1287 5.06661 26.25 6.50067 26.25Z"
+                    fill="white"
+                  />
+                </svg>
+              </button>
+            </>
+          ) : (
+            <>
+              <button
+                aria-label="Like"
+                onClick={() => onLiked(id)}
+                disabled={likeLoading}
+                className={`p-2 rounded hover:bg-white/20 ${likeLoading ? "opacity-60 pointer-events-none" : ""}`}
+              >
+                <svg
+                  width="32"
+                  height="30"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M12 21s-7.33-4.868-9.2-7.08C-0.24 10.9 2.12 6 6.6 6c2.04 0 3.43 1.01 4.4 2.09C11.97 7.01 13.36 6 15.4 6 19.88 6 22.24 10.9 21.2 13.92 19.33 16.132 12 21 12 21z"
+                    fill="white"
+                  />
+                </svg>
+              </button>
+              <button
+                aria-label="Comment"
+                onClick={() => {
+                  setCommentText("");
+                  setCommentOpen(true);
+                }}
+                className="p-2 rounded hover:bg-white/20"
+              >
+                <svg
+                  width="32"
+                  height="30"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M21 6.5C21 5.119 19.88 4 18.5 4h-13C3.119 4 2 5.119 2 6.5v7C2 15.881 3.119 17 4.5 17H7v3l3.5-3h8c1.38 0 2.5-1.119 2.5-2.5v-7z"
                     fill="white"
                   />
                 </svg>
@@ -207,6 +298,69 @@ export default function Post({
           />
         </div>
       </Modal>
+
+      <Modal
+        open={commentOpen}
+        title="Add comment"
+        width="w-2xl"
+        onClose={() => setCommentOpen(false)}
+        actions={[
+          {
+            key: "cancel",
+            label: "Cancel",
+            variant: "outlineBlack",
+            onClick: () => setCommentOpen(false),
+          },
+          {
+            key: "add",
+            label: "Add comment",
+            variant: "primary",
+            onClick: () => {
+              onComment?.(id, commentText);
+              setCommentOpen(false);
+            },
+          },
+        ]}
+      >
+        <div className="space-y-3">
+          <TextInput
+            value={commentText}
+            onChange={setCommentText}
+            placeholder="Write your comment..."
+            ariaLabel="Comment input"
+          />
+        </div>
+      </Modal>
+      {toastOpen && (
+        <div className="fixed right-6 bottom-6 z-50" aria-live="polite">
+          <div
+            role="status"
+            className="bg-[#47B960] text-white px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3 cursor-pointer transform transition duration-300"
+            onClick={() => {
+              setToastOpen(false);
+              if (toastTimer.current) {
+                clearTimeout(toastTimer.current);
+                toastTimer.current = null;
+              }
+            }}
+          >
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 20 20"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              className="w-5 h-5"
+            >
+              <path
+                d="M8.5 13.5L4 9l1.2-1.2L8.5 11.1l6.3-6.3L16 6l-7.5 7.5z"
+                fill="white"
+              />
+            </svg>
+            <span className="text-sm font-medium">{toastMessage}</span>
+          </div>
+        </div>
+      )}
     </article>
   );
 }

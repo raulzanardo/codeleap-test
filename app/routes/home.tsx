@@ -1,5 +1,5 @@
 // removed generated route types import (may be created by react-router typegen)
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Header } from "../components/header";
 import Card from "../components/card";
 import Post from "../components/post";
@@ -35,6 +35,9 @@ export default function Home() {
   const [pageNumber, setPageNumber] = useState<number>(1);
   const [totalCount, setTotalCount] = useState<number | null>(null);
   const [reloadKey, setReloadKey] = useState<number>(0);
+  const [toastOpen, setToastOpen] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
+  const toastTimer = useRef<number | null>(null);
 
   useEffect(() => {
     try {
@@ -67,6 +70,17 @@ export default function Home() {
 
     fetchPosts(currentUrl);
   }, [currentUrl, reloadKey]);
+
+  useEffect(() => {
+    if (!toastOpen) return;
+    toastTimer.current = window.setTimeout(() => setToastOpen(false), 2800);
+    return () => {
+      if (toastTimer.current) {
+        clearTimeout(toastTimer.current);
+        toastTimer.current = null;
+      }
+    };
+  }, [toastOpen]);
 
   // handlers for pagination controls
   function handleNext() {
@@ -107,6 +121,8 @@ export default function Home() {
       setCurrentUrl(baseUrl);
       setPageNumber(1);
       setReloadKey((k) => k + 1);
+      setToastMessage("Post created");
+      setToastOpen(true);
     } catch (e) {
       console.error(e);
     }
@@ -123,6 +139,8 @@ export default function Home() {
       setCurrentUrl(baseUrl);
       setPageNumber(1);
       setReloadKey((k) => k + 1);
+      setToastMessage("Post deleted");
+      setToastOpen(true);
     } catch (e) {
       console.error(e);
     }
@@ -213,6 +231,36 @@ export default function Home() {
           </div>
         )}
       </main>
+      {toastOpen && (
+        <div className="fixed right-6 bottom-6 z-50" aria-live="polite">
+          <div
+            role="status"
+            className="bg-[#47B960] text-white px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3 cursor-pointer transform transition duration-300"
+            onClick={() => {
+              setToastOpen(false);
+              if (toastTimer.current) {
+                clearTimeout(toastTimer.current);
+                toastTimer.current = null;
+              }
+            }}
+          >
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 20 20"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              className="w-5 h-5"
+            >
+              <path
+                d="M8.5 13.5L4 9l1.2-1.2L8.5 11.1l6.3-6.3L16 6l-7.5 7.5z"
+                fill="white"
+              />
+            </svg>
+            <span className="text-sm font-medium">{toastMessage}</span>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
