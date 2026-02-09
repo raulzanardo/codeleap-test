@@ -23,7 +23,7 @@ export default function Button({
     "inline-flex items-center justify-center gap-2 font-semibold rounded-[8px] text-[14px] w-[120px] h-[32px]";
 
   const variants: Record<string, string> = {
-    primary: "bg-[#7695EC] hover:bg-[#5a75d6] text-white",
+    primary: "bg-primary hover:bg-[#5a75d6] text-white",
     danger: "bg-red-500 hover:bg-red-600 text-white",
     success: "bg-green-500 hover:bg-green-600 text-white",
     outline: "bg-white border border-gray-300 text-black",

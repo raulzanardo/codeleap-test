@@ -6,6 +6,20 @@
     "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 }
 
+:root {
+  /* Primary brand color used across the app */
+  --color-primary: #7695EC;
+}
+
+/* Utility helpers for primary color (used when Tailwind utilities aren't applied) */
+.bg-primary { background-color: var(--color-primary); }
+.text-primary { color: var(--color-primary); }
+
+/* focus:ring helper to map Tailwind-like class `focus:ring-primary` to the CSS variable */
+.focus\:ring-primary:focus {
+  --tw-ring-color: var(--color-primary);
+}
+
 html,
 body {
   @apply bg-[#DDDDDD];

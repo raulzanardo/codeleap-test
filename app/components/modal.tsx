@@ -4,7 +4,6 @@ import Button from "./button";
 type ModalProps = {
   open: boolean;
   title?: string;
-  placeholder?: string;
   onClose?: () => void;
   onSubmit?: (value: string) => void;
   closeOnEsc?: boolean;
@@ -25,7 +24,6 @@ type ModalProps = {
 export function Modal({
   open,
   title = "Welcome to CodeLeap network!",
-  placeholder = "John doe",
   onClose,
   onSubmit,
   closeOnEsc = true,
