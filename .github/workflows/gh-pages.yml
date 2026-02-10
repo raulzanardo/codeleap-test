@@ -27,6 +27,23 @@ jobs:
       - name: Build
         run: npm run build
 
+      - name: Create index.html for Pages
+        run: |
+          cat > ./build/client/index.html << 'HTML'
+          <!doctype html>
+          <html>
+            <head>
+              <meta charset="utf-8" />
+              <meta name="viewport" content="width=device-width, initial-scale=1" />
+              <title>Codeleap Test</title>
+            </head>
+            <body>
+              <div id="root"></div>
+              <script type="module" src="./assets/entry.client-CwJuFZFm.js"></script>
+            </body>
+          </html>
+          HTML
+
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v3
 
