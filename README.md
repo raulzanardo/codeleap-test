@@ -1,8 +1,8 @@
 # CodeLeap Application Entry
 
-This repository contains the CodeLeap Engineering Test implementation—a frontend React application that demonstrates modern web development practices and UI/UX implementation based on a provided design specification.
+This repository contains the CodeLeap Engineering Test implementation of a frontend React application that demonstrates modern web development practices and UI/UX implementation based on a provided design specification.
 
-## 🚀 Live Demo
+## Live Demo
 
 **[View Live Application](https://raulzanardo.github.io/codeleap-test/)**
 
@@ -132,4 +132,4 @@ The application integrates with the CodeLeap Careers API:
 
 ---
 
-Built with ❤️ for CodeLeap Engineering Test
+Built with ❤️ for CodeLeap
